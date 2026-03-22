@@ -9,9 +9,7 @@ RUN mkdir -p src/schemas/proto \
     && python -m grpc_tools.protoc \
     --python_out=src/schemas/proto \
     --proto_path=proto \
-    proto/face_embedding.proto \
     proto/face_update.proto \
-    proto/face_result.proto \
     && touch src/schemas/proto/__init__.py
 
 # Stage 2: runtime
@@ -32,4 +30,6 @@ COPY --from=builder /build/src/schemas/proto/ src/schemas/proto/
 ENV PYTHONPATH=/app/src
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "src/main.py"]
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
