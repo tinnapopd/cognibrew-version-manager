@@ -34,12 +34,26 @@ class DockerConfig(BaseSettings):
     HEALTH_POLL_S: int = Field(default=1)
 
 
+class SyncConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        frozen=False,
+        env_prefix="SYNC_",
+        case_sensitive=False,
+    )
+
+    CLOUD_URL: str = Field(default="http://localhost:8000")
+    INTERVAL_HOURS: int = Field(default=24)
+    PAGE_SIZE: int = Field(default=50)
+    ENABLED: bool = Field(default=True)
+
+
 class Settings:
     """Main configuration class aggregating all settings."""
 
     def __init__(self) -> None:
         self.rabbitmq = RabbitMQConfig()
         self.docker = DockerConfig()
+        self.sync = SyncConfig()
 
 
 # Module-level singleton instance
