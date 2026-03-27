@@ -4,4 +4,5 @@ protobuf>=5.29
 python-json-logger==4.0.0
 python-multipart==0.0.22
 pydantic-settings==2.13.1
+pytz>=2024.1
 schedule==1.2.2
