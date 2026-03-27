@@ -44,17 +44,10 @@ class SyncConfig(BaseSettings):
     )
 
     URL: str = Field(default="http://edge-sync.melierx.com/api/v1/sync/bundle")
-    DEVICE_ID: str = Field(default_factory=lambda: SyncConfig._get_mac())
+    DEVICE_ID: str = Field(default="test-id")
     PAGE_SIZE: int = Field(default=50)
     SCHEDULE_TIME: str = Field(default="01:00")
     CHECK_EVERY: int = Field(default=60)  # seconds
-
-    @staticmethod
-    def _get_mac() -> str:
-        mac = uuid.getnode()
-        return ":".join(
-            f"{(mac >> (8 * i)) & 0xFF:02x}" for i in range(5, -1, -1)
-        ).replace(":", "-")
 
 
 class Settings:
