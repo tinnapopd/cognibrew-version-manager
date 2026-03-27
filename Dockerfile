@@ -30,6 +30,6 @@ COPY --from=builder /build/src/schemas/proto/ src/schemas/proto/
 ENV PYTHONPATH=/app/src
 ENV PYTHONUNBUFFERED=1
 
-EXPOSE 8000
+WORKDIR /app/src
 
 CMD ["python", "main.py"]
