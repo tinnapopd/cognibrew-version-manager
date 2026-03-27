@@ -27,6 +27,10 @@ def run_sync_task():
 
 
 if __name__ == "__main__":
+    logger.info(
+        "Starting scheduled sync task every %s of a day...",
+        settings.sync.SCHEDULE_TIME,
+    )
     schedule.every().day.at(settings.sync.SCHEDULE_TIME).do(run_sync_task)
     while True:
         schedule.run_pending()

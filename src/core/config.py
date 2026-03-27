@@ -46,7 +46,7 @@ class SyncConfig(BaseSettings):
     URL: str = Field(default="http://edge-sync.melierx.com/api/v1/sync/bundle")
     DEVICE_ID: str = Field(default_factory=lambda: SyncConfig._get_mac())
     PAGE_SIZE: int = Field(default=50)
-    SCHEDULE_TIME: str = Field(default="00:00")
+    SCHEDULE_TIME: str = Field(default="01:00")
     CHECK_EVERY: int = Field(default=60)  # seconds
 
     @staticmethod
