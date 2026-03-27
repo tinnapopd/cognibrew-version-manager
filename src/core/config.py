@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -41,10 +43,18 @@ class SyncConfig(BaseSettings):
         case_sensitive=False,
     )
 
-    CLOUD_URL: str = Field(default="http://localhost:8000")
-    INTERVAL_HOURS: int = Field(default=24)
+    URL: str = Field(default="http://edge-sync.melierx.com/api/v1/sync/bundle")
+    DEVICE_ID: str = Field(default_factory=lambda: SyncConfig._get_mac())
     PAGE_SIZE: int = Field(default=50)
-    ENABLED: bool = Field(default=True)
+    SCHEDULE_TIME: str = Field(default="00:00")
+    CHECK_EVERY: int = Field(default=60)  # seconds
+
+    @staticmethod
+    def _get_mac() -> str:
+        mac = uuid.getnode()
+        return ":".join(
+            f"{(mac >> (8 * i)) & 0xFF:02x}" for i in range(5, -1, -1)
+        ).replace(":", "-")
 
 
 class Settings:

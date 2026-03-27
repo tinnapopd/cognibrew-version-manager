@@ -1,43 +1,33 @@
-import asyncio
-import os
-from contextlib import asynccontextmanager
-from typing import AsyncIterator
+"""
+1. Pull bundle from sync server
+2. Send face-update events to RabbitMQ using pagination
+3. Apply similarity threshold to update recognition service containers
+"""
 
-import uvicorn
-from fastapi import FastAPI
+import time
 
-from api.face_update import router as face_update_router
-from api.recognition_config import router as config_router
-from api.sync import router as sync_router
-import core.sync_client as sync_client_mod
+import schedule
 
+from core.config import settings
+from core.logger import Logger
+from processors.pull_processor import pull_bundle
+from processors.upgrade_processor import apply_threshold
 
-@asynccontextmanager
-async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    """Start the background sync loop on startup."""
-    task = asyncio.create_task(sync_client_mod.start_sync_loop())
-    yield
-    task.cancel()
+logger = Logger().get_logger()
 
 
-app = FastAPI(
-    title="Cognibrew Version Manager",
-    description=(
-        "Manage running service configuration, push face-update "
-        "events to RabbitMQ, and pull sync bundles from cloud."
-    ),
-    version="0.2.0",
-    lifespan=lifespan,
-)
+def run_sync_task():
+    logger.info("Starting scheduled sync task...")
+    try:
+        similarity_threshold = pull_bundle()
+        apply_threshold(similarity_threshold)
+        logger.info("Task completed successfully.")
+    except Exception as e:
+        logger.error(f"Task failed: {e}")
 
-app.include_router(config_router)
-app.include_router(face_update_router)
-app.include_router(sync_router)
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        log_level=os.getenv("LOG_LEVEL", "info").lower(),
-    )
+    schedule.every().day.at(settings.sync.SCHEDULE_TIME).do(run_sync_task)
+    while True:
+        schedule.run_pending()
+        time.sleep(settings.sync.CHECK_EVERY)
