@@ -21,16 +21,18 @@ class MessageQueue:
         self,
         exchange_name: str | None = None,
         queue_name: str | None = None,
+        binding_keys: list[str] | None = None,
     ) -> None:
         self._config = settings.rabbitmq
         self._exchange = (
             exchange_name or self._config.FACE_UPDATE_EXCHANGE_NAME
         )
         self._queue = queue_name or self._config.FACE_UPDATE_QUEUE_NAME
+        self._binding_keys = binding_keys
         self._connection: pika.BlockingConnection | None = None
         self._channel: BlockingChannel | None = None
 
-    def connect(self, binding_keys: list[str] | None = None) -> None:
+    def connect(self) -> None:
         credentials = pika.PlainCredentials(
             username=self._config.USERNAME,
             password=self._config.PASSWORD,
@@ -51,13 +53,16 @@ class MessageQueue:
             durable=True,
         )
 
-        # Only set up queue + bindings when the caller needs to consume
-        if binding_keys is not None:
-            self._channel.queue_declare(
-                queue=self._queue,
-                durable=True,
-            )
-            for key in binding_keys:
+        # Always declare the queue so messages are never dropped
+        # when the publisher connects before the consumer.
+        self._channel.queue_declare(
+            queue=self._queue,
+            durable=True,
+        )
+
+        # Bind queue to exchange with specified routing keys
+        if self._binding_keys is not None:
+            for key in self._binding_keys:
                 self._channel.queue_bind(
                     queue=self._queue,
                     exchange=self._exchange,

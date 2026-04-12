@@ -17,7 +17,9 @@ def pull_bundle(
     fallback_threshold: float = 0.5,
 ) -> float:
 
-    mq = MessageQueue()
+    mq = MessageQueue(
+        binding_keys=[settings.rabbitmq.FACE_UPDATE_ROUTING_KEY],
+    )
 
     # Get yesterday date
     now = datetime.now(ZoneInfo("Asia/Bangkok"))
