@@ -1,7 +1,7 @@
 from typing import Callable
 
-import pika
-from pika.adapters.blocking_connection import BlockingChannel
+import pika  # type: ignore
+from pika.adapters.blocking_connection import BlockingChannel  # type: ignore
 
 from core.config import settings
 from core.logger import Logger

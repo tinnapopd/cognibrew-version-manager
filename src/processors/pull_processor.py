@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from uuid import uuid4
 
-import requests
+import requests  # type: ignore
 
 from core.config import settings
 from core.logger import Logger
