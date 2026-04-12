@@ -27,6 +27,9 @@ def run_sync_task():
 
 
 if __name__ == "__main__":
+    # Run once immediately on startup
+    run_sync_task()
+
     logger.info(
         "Starting scheduled sync task every %s of a day...",
         settings.sync.SCHEDULE_TIME,

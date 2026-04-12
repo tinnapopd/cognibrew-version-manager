@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from uuid import uuid4
 
 import requests
 
@@ -57,6 +58,7 @@ def pull_bundle(
                 for embedding in embeddings:
                     # Send face-update event to RabbitMQ
                     msg = PersonUpdate(
+                        face_id=str(uuid4()),
                         username=user,
                         embedding=embedding,
                     )
